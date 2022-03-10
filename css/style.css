@@ -39,7 +39,7 @@ body {
   place-items: center;
 }
 
-.outer-ring {
+.outerRing {
   display: grid;
   place-items: center;
   width: 415px;
@@ -135,4 +135,15 @@ body {
   bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.3);
+}
+
+.playBtn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.child {
+  color: #fff;
 }

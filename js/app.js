@@ -2,7 +2,7 @@ const minElem = document.querySelector("#minutes");
 const secElem = document.querySelector("#seconds");
 const settings = document.querySelector("#settings");
 const startStop = document.querySelector("#stsp");
-const progressBar = document.querySelector(".outer-ring");
+const progressBar = document.querySelector(".outerRing");
 
 let toggleSettings = false;
 let minutes = document.querySelector("#minutes").innerHTML;
@@ -62,7 +62,7 @@ function startStopProgress() {
     clearInterval(progress);
     progress = null;
     progressStart = 0;
-    progressBar.style.background = `conic-gradient(
+    progressBar.style.backgroundColor = `conic-gradient(
       #17171a 360deg,
       #17171a 360deg
     )`;
@@ -84,7 +84,7 @@ function progressTrack() {
   )`;
 
   if (progressStart === progressEnd) {
-    progressBar.style.background = `conic-gradient(
+    progressBar.style.backgroundColor = `conic-gradient(
       #00aa51 360deg,
       #00aa51 360deg
     )`;
@@ -123,14 +123,52 @@ const openModal = document.getElementById("open-modal");
 const closeModal = document.getElementById("close-modal");
 const playCategory = document.getElementById("play-category");
 
-// Event Listeners
-openModal.addEventListener("click", () => {
-  document.getElementById("overlay").style.display = "block";
-});
+// // Event Listeners
+// openModal.addEventListener("click", () => {
+//   document.getElementById("overlay").style.display = "block";
+// });
 
-closeModal.addEventListener("click", () => {
-  document.getElementById("overlay").style.display = "none";
-});
+// closeModal.addEventListener("click", () => {
+//   document.getElementById("overlay").style.display = "none";
+// });
 
 // Categories
-const play = [];
+const play = [
+  "Fly paper plane",
+  "Play with ball - bounce in arm",
+  "Hand flip pen",
+  "Dance or sing out loud",
+  "Play with your pet or someone around you",
+];
+
+const energy = [
+  "Box breathing",
+  "Close eyes and focus on your breath",
+  "Sunbath barefoot",
+  "Vigorously rub hands + Swing arms while turning turso",
+  "Vigorously rub hands + shake body while gently jumping in one spot",
+];
+
+const move = [
+  "Push ups",
+  "Situps",
+  "Arm circles forward x60 & backward. Arms forward up & down. Arms sideways up & down. Arms above the head raises. x20 each",
+  "Alternate high knees _ alternate heel kicks_ calf raises (reps: each x30)",
+  "Flossing or snack exercise",
+];
+
+const stretch = [
+  "Squats",
+  "Neck, shoulders & big arm circles and holds",
+  "Leg and hip stretches",
+  "Joints all over the body in circles",
+  "Bend down and touch toes",
+];
+
+const create = [
+  "Doodle standing up",
+  "Color standing up",
+  "Drum/play a song",
+  "Haiku",
+  "Improvise anything",
+];
