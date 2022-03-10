@@ -16,8 +16,8 @@
     #3a393f 0%,
     #17171a 100%
   );
-  --font-timer: "Bebas Neue", cursive;
-  --font-start: "Poppins", sans-serif;
+  --font-timer: 'Bebas Neue', cursive;
+  --font-start: 'Poppins', sans-serif;
   --font-clr: #fff;
 }
 
@@ -146,4 +146,9 @@ body {
 
 .child {
   color: #fff;
+}
+
+#playCategory {
+  color: #fff;
+  font-size: 14px;
 }

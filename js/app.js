@@ -1,12 +1,20 @@
-const minElem = document.querySelector("#minutes");
-const secElem = document.querySelector("#seconds");
-const settings = document.querySelector("#settings");
-const startStop = document.querySelector("#stsp");
-const progressBar = document.querySelector(".outerRing");
+const minElem = document.querySelector('#minutes');
+const secElem = document.querySelector('#seconds');
+const settings = document.querySelector('#settings');
+const startStop = document.querySelector('#stsp');
+const progressBar = document.querySelector('.outerRing');
+const breakBtn = document.querySelector('#breakBtn');
+const playCategory = document.querySelector('#playCategory');
 
+const DEFAULT_START_TIME = { MINUTES: '00', SECONDS: '03' };
+const DEFAULT_BREAK_TIME = { MINUTES: '00', SECONDS: '01' };
+
+breakBtn.style.display = 'none';
+minElem.innerHTML = DEFAULT_START_TIME.MINUTES;
+secElem.innerHTML = DEFAULT_START_TIME.SECONDS;
 let toggleSettings = false;
-let minutes = document.querySelector("#minutes").innerHTML;
-let seconds = document.querySelector("#seconds").innerHTML;
+let minutes = document.querySelector('#minutes').innerHTML;
+let seconds = document.querySelector('#seconds').innerHTML;
 let progress = null;
 let progressStart = 0;
 let progressEnd = parseInt(minutes) * 60 + parseInt(seconds);
@@ -14,100 +22,138 @@ let speed = 1000;
 let degTravel = 360 / progressEnd;
 let secRem = 0;
 let minRem = 0;
+let isPaused = false;
+let isBreak = false;
 
-settings.addEventListener("click", () => {
+settings.addEventListener('click', () => {
   if (!toggleSettings) {
+    pauseProgress();
     toggleSettings = true;
     minElem.contentEditable = true;
     minElem.style.borderBottom = `1px dashed #ffffff50`;
     secElem.contentEditable = true;
     secElem.style.borderBottom = `1px dashed #ffffff50`;
   } else {
-    resetValues();
+    toggleSettings = false;
+    minElem.contentEditable = false;
+    minElem.style.borderBottom = `none`;
+    secElem.contentEditable = false;
+    secElem.style.borderBottom = `none`;
   }
 });
 
-minElem.addEventListener("blur", () => {
+function startRestTimer() {
+  isBreak = true;
+  breakBtn.style.display = 'inline-block';
+  document.querySelector('#minutes').innerHTML = DEFAULT_BREAK_TIME.MINUTES;
+  document.querySelector('#seconds').innerHTML = DEFAULT_BREAK_TIME.SECONDS;
+  const categoriesArray = Object.keys(categories);
+  const randomCategoryIndex = Math.floor(
+    Math.random() * categoriesArray.length,
+  );
+  const randomCategoryKey = categoriesArray[randomCategoryIndex];
+
+  const randomCategory = categories[randomCategoryKey];
+
+  const randomSubCategoryIndex = Math.floor(
+    Math.random() * randomCategory.length,
+  );
+
+  const randomSubCategory = randomCategory[randomSubCategoryIndex];
+
+  playCategory.innerHTML = randomSubCategory;
+}
+
+minElem.addEventListener('blur', () => {
   resetValues();
 });
 
-secElem.addEventListener("blur", () => {
+secElem.addEventListener('blur', () => {
   resetValues();
 });
 
-startStop.addEventListener("click", () => {
-  if (startStop.innerHTML === "START") {
-    if (!(parseInt(minutes) === 0 && parseInt(seconds) === 0)) {
-      startStop.innerHTML = "PAUSE";
-      startStopProgress();
-    } else {
-      alert("Enter the time amount in your timer!");
-    }
-  } else if (startStop.innerHTML === "PAUSE") {
-    clearInterval(progress);
-    startStop.innerHTML = "START";
-  } else if (startStop.innerHTML === "START") {
+function startProgress() {
+  if (toggleSettings) return;
+  isPaused = false;
+  startStop.innerHTML = 'PAUSE';
+  if (!progress) {
     progress = setInterval(progressTrack, speed);
-    startStop.innerHTML = "PAUSE";
-  } else {
-    startStop.innerHTML = "START";
-    startStopProgress();
   }
-});
+}
+function pauseProgress() {
+  isPaused = true;
+  startStop.innerHTML = 'START';
+}
 
-function startStopProgress() {
-  if (!progress && startStop.innerHTML === "PAUSE") {
-    progress = setInterval(progressTrack, speed);
-  } else {
+function stopProgress() {
+  if (progress) {
     clearInterval(progress);
     progress = null;
-    progressStart = 0;
-    progressBar.style.backgroundColor = `conic-gradient(
-      #17171a 360deg,
-      #17171a 360deg
-    )`;
+  }
+  resetValues();
+}
+
+function handleStartPauseClick() {
+  let clickedStart = startStop.innerHTML === 'START';
+  let isAtZero = parseInt(minutes) === 0 && parseInt(seconds) === 0;
+
+  if (clickedStart) {
+    return startProgress();
+  } else if (isAtZero) {
+    alert('Enter the time amount in your timer!');
+  } else {
+    return pauseProgress();
   }
 }
 
+startStop.addEventListener('click', handleStartPauseClick);
+
 function progressTrack() {
-  progressStart++;
+  if (!isPaused) {
+    progressStart++;
 
-  secRem = Math.floor((progressEnd - progressStart) % 60);
-  minRem = Math.floor((progressEnd - progressStart) / 60);
+    secRem = Math.floor((progressEnd - progressStart) % 60);
+    minRem = Math.floor((progressEnd - progressStart) / 60);
 
-  secElem.innerHTML = secRem.toString().length === 2 ? secRem : `0${secRem}`;
-  minElem.innerHTML = minRem.toString().length === 2 ? minRem : `0${minRem}`;
+    secElem.innerHTML = secRem.toString().length === 2 ? secRem : `0${secRem}`;
+    minElem.innerHTML = minRem.toString().length === 2 ? minRem : `0${minRem}`;
 
-  progressBar.style.background = `conic-gradient(
-    #9d0000 ${progressStart * degTravel}deg,
-    #17171a ${progressStart * degTravel}deg
-  )`;
-
-  if (progressStart === progressEnd) {
-    progressBar.style.backgroundColor = `conic-gradient(
-      #00aa51 360deg,
-      #00aa51 360deg
+    progressBar.style.background = `conic-gradient(
+      #9d0000 ${progressStart * degTravel}deg,
+      #17171a ${progressStart * degTravel}deg
     )`;
-    clearInterval(progress);
-    startStop.innerHTML = "START";
-    progress = null;
-    progressStart = 0;
+
+    if (progressStart === progressEnd) {
+      progressBar.style.background = `conic-gradient(
+        #00aa51 360deg,
+        #00aa51 360deg
+      )`;
+
+      if (!isBreak) {
+        startRestTimer();
+      } else {
+        isBreak = false;
+        document.querySelector('#minutes').innerHTML =
+          DEFAULT_START_TIME.MINUTES;
+        document.querySelector('#seconds').innerHTML =
+          DEFAULT_START_TIME.SECONDS;
+        breakBtn.style.display = 'none';
+        playCategory.style.display = 'none';
+      }
+      stopProgress();
+    }
   }
 }
 
 function resetValues() {
-  if (progress) {
-    clearInterval(progress);
-  }
-
-  minutes = document.querySelector("#minutes").innerHTML;
-  seconds = document.querySelector("#seconds").innerHTML;
+  pauseProgress();
+  minutes = document.querySelector('#minutes').innerHTML;
+  seconds = document.querySelector('#seconds').innerHTML;
   toggleSettings = false;
   minElem.contentEditable = false;
   minElem.style.borderBottom = `none`;
   secElem.contentEditable = false;
   secElem.style.borderBottom = `none`;
-  progress = null;
   progressStart = 0;
   console.log(progressStart);
   progressEnd = parseInt(minutes) * 60 + parseInt(seconds);
@@ -118,57 +164,41 @@ function resetValues() {
   )`;
 }
 
-// BUTTON FUNCTIONALITY
-const openModal = document.getElementById("open-modal");
-const closeModal = document.getElementById("close-modal");
-const playCategory = document.getElementById("play-category");
-
-// // Event Listeners
-// openModal.addEventListener("click", () => {
-//   document.getElementById("overlay").style.display = "block";
-// });
-
-// closeModal.addEventListener("click", () => {
-//   document.getElementById("overlay").style.display = "none";
-// });
-
-// Categories
-const play = [
-  "Fly paper plane",
-  "Play with ball - bounce in arm",
-  "Hand flip pen",
-  "Dance or sing out loud",
-  "Play with your pet or someone around you",
-];
-
-const energy = [
-  "Box breathing",
-  "Close eyes and focus on your breath",
-  "Sunbath barefoot",
-  "Vigorously rub hands + Swing arms while turning turso",
-  "Vigorously rub hands + shake body while gently jumping in one spot",
-];
-
-const move = [
-  "Push ups",
-  "Situps",
-  "Arm circles forward x60 & backward. Arms forward up & down. Arms sideways up & down. Arms above the head raises. x20 each",
-  "Alternate high knees _ alternate heel kicks_ calf raises (reps: each x30)",
-  "Flossing or snack exercise",
-];
-
-const stretch = [
-  "Squats",
-  "Neck, shoulders & big arm circles and holds",
-  "Leg and hip stretches",
-  "Joints all over the body in circles",
-  "Bend down and touch toes",
-];
-
-const create = [
-  "Doodle standing up",
-  "Color standing up",
-  "Drum/play a song",
-  "Haiku",
-  "Improvise anything",
-];
+// Categories'
+const categories = {
+  play: [
+    'Fly paper plane',
+    'Play with ball - bounce in arm',
+    'Hand flip pen',
+    'Dance or sing out loud',
+    'Play with your pet or someone around you',
+  ],
+  energy: [
+    'Box breathing',
+    'Close eyes and focus on your breath',
+    'Sunbath barefoot',
+    'Vigorously rub hands + Swing arms while turning turso',
+    'Vigorously rub hands + shake body while gently jumping in one spot',
+  ],
+  move: [
+    'Push ups',
+    'Situps',
+    'Arm circles forward x60 & backward. Arms forward up & down. Arms sideways up & down. Arms above the head raises. x20 each',
+    'Alternate high knees _ alternate heel kicks_ calf raises (reps: each x30)',
+    'Flossing or snack exercise',
+  ],
+  stretch: [
+    'Squats',
+    'Neck, shoulders & big arm circles and holds',
+    'Leg and hip stretches',
+    'Joints all over the body in circles',
+    'Bend down and touch toes',
+  ],
+  create: [
+    'Doodle standing up',
+    'Color standing up',
+    'Drum/play a song',
+    'Haiku',
+    'Improvise anything',
+  ],
+};
